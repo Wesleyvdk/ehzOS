@@ -7,7 +7,7 @@ import Win12LoadingScreen from "../components/Win12LoadingScreen";
 
 export function meta({ }: Route.MetaArgs) {
   return [
-    { title: "Portfolio OS - Interactive Desktop Experience" },
+    { title: "ehz OS - Interactive Portfolio Desktop" },
     { name: "description", content: "An interactive desktop-like portfolio showcasing projects, skills, and experience in a unique OS interface." },
   ];
 }
