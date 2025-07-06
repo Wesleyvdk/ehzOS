@@ -1,0 +1,67 @@
+[
+    {
+        "version": "v2.2.0",
+        "title": "Real Web Browsing & Edge Enhancement",
+        "date": "2025-07-06",
+        "changes": [
+            "Implemented real web browsing functionality in Edge app with actual iframe loading",
+            "Added Bing search integration - non-URL inputs automatically search on Bing",
+            "Enhanced URL detection with win12-style regex for proper URL vs search query handling",
+            "Added real navigation history with back/forward functionality per tab",
+            "Implemented proper tab management with loading states and favicon detection",
+            "Added quick links bar with common websites (GitHub, LinkedIn, YouTube, AP Gaming, Treffortly)",
+            "Enhanced link integration - other apps can now open URLs in Edge instead of new browser tabs",
+            "Added proper iframe security with sandbox attributes",
+            "Implemented automatic protocol detection (adds https:// to URLs without protocols)",
+            "Created openEdgeWithUrl() function for seamless app integration"
+        ]
+    },
+    {
+        "version": "v2.1.0",
+        "title": "Enhanced Win12 Design System",
+        "date": "2025-07-06",
+        "changes": [
+            "Completely redesigned File Explorer with proper win12 styling",
+            "Enhanced Task Manager with performance monitoring",
+            "Improved Settings app with modern card-based layout",
+            "Added proper theming system with CSS custom properties",
+            "Fixed dark mode compatibility issues"
+        ]
+    },
+    {
+        "version": "v2.0.0",
+        "title": "Win12 UI Overhaul",
+        "date": "2025-07-05",
+        "changes": [
+            "Redesigned all system apps to match Windows 12 aesthetic",
+            "Implemented proper window management system",
+            "Added taskbar with window previews",
+            "Enhanced desktop with widgets and start menu",
+            "Improved responsive design for better mobile experience"
+        ]
+    },
+    {
+        "version": "v1.5.0",
+        "title": "System Enhancement",
+        "date": "2025-07-04",
+        "changes": [
+            "Added new system applications (Calculator, Notepad)",
+            "Enhanced window management with proper minimize/maximize",
+            "Implemented system tray with notifications",
+            "Added desktop context menu and shortcuts",
+            "Improved performance and memory management"
+        ]
+    },
+    {
+        "version": "v1.0.0",
+        "title": "Initial Release",
+        "date": "2025-07-03",
+        "changes": [
+            "Created Windows-inspired desktop environment",
+            "Implemented basic window management",
+            "Added core system applications",
+            "Created taskbar with start menu",
+            "Established foundation for future enhancements"
+        ]
+    }
+]
