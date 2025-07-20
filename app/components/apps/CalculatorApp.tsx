@@ -1,10 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function CalculatorApp() {
     const [display, setDisplay] = useState('0');
     const [previousValue, setPreviousValue] = useState<number | null>(null);
     const [operation, setOperation] = useState<string | null>(null);
     const [waitingForNewValue, setWaitingForNewValue] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth <= 768);
+        };
+        
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        
+        return () => {
+            window.removeEventListener('resize', checkMobile);
+        };
+    }, []);
 
     const inputNumber = (num: string) => {
         if (waitingForNewValue) {
@@ -106,7 +120,9 @@ export default function CalculatorApp() {
         children: React.ReactNode;
         span?: number;
     }) => {
-        const baseClasses = "h-12 rounded border border-gray-600 font-medium text-base cursor-pointer transition-all duration-100 flex items-center justify-center hover:bg-gray-600";
+        const buttonHeight = isMobile ? 'h-14' : 'h-12';
+        const fontSize = isMobile ? 'text-lg' : 'text-base';
+        const baseClasses = `${buttonHeight} rounded border border-gray-600 font-medium ${fontSize} cursor-pointer transition-all duration-100 flex items-center justify-center hover:bg-gray-600`;
         const typeClasses = className === 'operator' ? 'bg-blue-600 text-white hover:bg-blue-700' :
             className === 'equals' ? 'bg-blue-600 text-white hover:bg-blue-700 text-xl' :
                 className === 'function' ? 'bg-gray-700 text-white hover:bg-gray-600' :
@@ -126,14 +142,14 @@ export default function CalculatorApp() {
     };
 
     return (
-        <div className="w-full h-full p-5 bg-gray-900 text-white font-sans">
+        <div className={`w-full h-full ${isMobile ? 'p-3' : 'p-5'} bg-gray-900 text-white font-sans`}>
             {/* Display */}
-            <div className="bg-gray-800 border border-gray-600 rounded-lg p-5 mb-5 text-right text-3xl font-light min-h-[60px] flex items-center justify-end break-all overflow-hidden">
+            <div className={`bg-gray-800 border border-gray-600 rounded-lg ${isMobile ? 'p-4 mb-4 text-2xl' : 'p-5 mb-5 text-3xl'} text-right font-light min-h-[60px] flex items-center justify-end break-all overflow-hidden`}>
                 {display}
             </div>
 
             {/* Buttons Grid */}
-            <div className="grid grid-cols-4 gap-2 h-[calc(100%-120px)]">
+            <div className={`grid grid-cols-4 ${isMobile ? 'gap-3' : 'gap-2'} h-[calc(100%-120px)]`}>
                 {/* Row 1: Memory and Clear */}
                 <Button onClick={percentage} className="function">%</Button>
                 <Button onClick={clearEntry} className="function">CE</Button>
@@ -181,4 +197,4 @@ export default function CalculatorApp() {
             </div>
         </div>
     );
-} 
+}

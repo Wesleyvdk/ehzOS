@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useOS } from '../context/OSContext';
 import {
@@ -15,6 +15,21 @@ import {
 
 export default function Taskbar() {
     const { state, toggleStartMenu, toggleTheme, toggleWidgets, toggleCopilot } = useOS();
+    const [isMobile, setIsMobile] = useState(false);
+
+    // Mobile detection
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth <= 768);
+        };
+        
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        
+        return () => {
+            window.removeEventListener('resize', checkMobile);
+        };
+    }, []);
 
     const getCurrentTime = () => {
         const now = new Date();
@@ -46,7 +61,11 @@ export default function Taskbar() {
 
     return (
         <motion.div
-            className="fixed bottom-2.5 left-0 right-0 flex justify-center items-center z-[92] px-1.5"
+            className={`${
+                isMobile 
+                    ? 'fixed bottom-0 left-0 right-0 flex items-center justify-around px-4 py-2 bg-white/5 backdrop-blur-md border-t border-white/10 z-[92]' 
+                    : 'fixed bottom-2.5 left-0 right-0 flex justify-center items-center z-[92] px-1.5'
+            }`}
             initial="hidden"
             animate="visible"
             variants={dockVariants}
@@ -54,13 +73,21 @@ export default function Taskbar() {
         >
             {/* Start Section */}
             <motion.div
-                className="flex items-center h-10 bg-white/5 backdrop-blur-md backdrop-saturate-150 rounded-lg border border-white/10 shadow-lg shadow-black/20 px-1.5 mx-0.5"
-                whileHover={{ backdropFilter: "blur(20px) saturate(150%) brightness(120%)" }}
+                className={`${
+                    isMobile 
+                        ? 'flex flex-col items-center justify-center' 
+                        : 'flex items-center h-10 bg-white/5 backdrop-blur-md backdrop-saturate-150 rounded-lg border border-white/10 shadow-lg shadow-black/20 px-1.5 mx-0.5'
+                }`}
+                whileHover={!isMobile ? { backdropFilter: "blur(20px) saturate(150%) brightness(120%)" } : {}}
                 transition={{ duration: 0.2 }}
             >
                 {/* Start Button */}
                 <motion.button
-                    className="relative w-8 h-8 flex items-center justify-center rounded-lg overflow-hidden"
+                    className={`relative ${
+                        isMobile 
+                            ? 'w-12 h-12 flex flex-col items-center justify-center rounded-lg' 
+                            : 'w-8 h-8 flex items-center justify-center rounded-lg'
+                    } overflow-hidden`}
                     onClick={toggleStartMenu}
                     variants={iconVariants}
                     initial="idle"
@@ -76,7 +103,7 @@ export default function Taskbar() {
                                 exit={{ opacity: 0, y: 27 }}
                                 transition={{ duration: 0.2, delay: 0.2 }}
                             >
-                                <Menu className="w-5 h-5 text-white" />
+                                <Menu className={`${isMobile ? 'w-6 h-6' : 'w-5 h-5'} text-white`} />
                             </motion.div>
                         ) : (
                             <motion.div
@@ -89,115 +116,166 @@ export default function Taskbar() {
                                 <img
                                     src="/icon/logo.svg"
                                     alt="ehzOS 12"
-                                    className="w-5 h-5"
+                                    className={isMobile ? 'w-6 h-6' : 'w-5 h-5'}
                                 />
                             </motion.div>
                         )}
                     </AnimatePresence>
                 </motion.button>
 
-                {/* Search Button */}
-                <motion.button
-                    className="relative w-8 h-8 flex items-center justify-center rounded-lg ml-1"
-                    variants={iconVariants}
-                    initial="idle"
-                    whileHover="hover"
-                    whileTap="tap"
-                >
-                    <motion.div
-                        className="relative"
-                        whileHover={{ scale: 1.1, rotate: 360 }}
-                        transition={{ duration: 0.2 }}
+                {isMobile && (
+                    <span className="text-xs text-white/70 mt-1">Start</span>
+                )}
+                
+                {/* Search Button - Desktop only */}
+                {!isMobile && (
+                    <motion.button
+                        className="relative w-8 h-8 flex items-center justify-center rounded-lg ml-1"
+                        variants={iconVariants}
+                        initial="idle"
+                        whileHover="hover"
+                        whileTap="tap"
                     >
-                        <Search className="w-4 h-4 text-white" />
-                    </motion.div>
-                </motion.button>
+                        <motion.div
+                            className="relative"
+                            whileHover={{ scale: 1.1, rotate: 360 }}
+                            transition={{ duration: 0.2 }}
+                        >
+                            <Search className="w-4 h-4 text-white" />
+                        </motion.div>
+                    </motion.button>
+                )}
             </motion.div>
 
-            {/* Taskbar Section (for running apps and widgets/copilot) */}
+            {/* Widgets Button */}
             <motion.div
-                className="flex items-center h-10 bg-white/5 backdrop-blur-md backdrop-saturate-150 rounded-lg border border-white/10 shadow-lg shadow-black/20 px-1.5 mx-0.5 min-w-0 max-w-[600px] gap-1"
+                className={`${
+                    isMobile 
+                        ? 'flex flex-col items-center justify-center' 
+                        : 'flex items-center h-10 bg-white/5 backdrop-blur-md backdrop-saturate-150 rounded-lg border border-white/10 shadow-lg shadow-black/20 px-1.5 mx-0.5 min-w-0 max-w-[600px] gap-1'
+                }`}
                 id="toolbar"
             >
-                {/* Widgets Button */}
                 <button
-                    className={`taskbar-btn ${state.widgetsOpen ? 'active' : ''}`}
+                    className={`${
+                        isMobile 
+                            ? 'w-12 h-12 flex flex-col items-center justify-center rounded-lg' 
+                            : `taskbar-btn ${state.widgetsOpen ? 'active' : ''}`
+                    }`}
                     onClick={toggleWidgets}
                     title="Widgets"
                 >
-                    <LayoutGrid size={20} />
+                    <LayoutGrid size={isMobile ? 24 : 20} />
+                    {isMobile && (
+                        <span className="text-xs text-white/70 mt-1">Widgets</span>
+                    )}
                 </button>
+                
+                {!isMobile && (
+                    <>
+                        {/* Copilot Button */}
+                        <motion.button
+                            className={`w-8 h-8 flex items-center justify-center rounded-lg ${state.copilotOpen ? 'bg-white/20' : ''}`}
+                            variants={iconVariants}
+                            initial="idle"
+                            whileHover="hover"
+                            whileTap="tap"
+                            onClick={toggleCopilot}
+                        >
+                            <img
+                                src="/icon/copilot.svg"
+                                alt="Copilot"
+                                className="w-4 h-4"
+                            />
+                        </motion.button>
 
-                {/* Copilot Button */}
-                <motion.button
-                    className={`w-8 h-8 flex items-center justify-center rounded-lg ${state.copilotOpen ? 'bg-white/20' : ''}`}
-                    variants={iconVariants}
-                    initial="idle"
-                    whileHover="hover"
-                    whileTap="tap"
-                    onClick={toggleCopilot}
-                >
-                    <img
-                        src="/icon/copilot.svg"
-                        alt="Copilot"
-                        className="w-4 h-4"
-                    />
-                </motion.button>
-
-                {/* Running applications taskbar */}
-                <div id="taskbar" className="flex items-center overflow-hidden transition-all duration-75 ml-2">
-                    {/* Running applications will be dynamically added here */}
-                </div>
+                        {/* Running applications taskbar */}
+                        <div id="taskbar" className="flex items-center overflow-hidden transition-all duration-75 ml-2">
+                            {/* Running applications will be dynamically added here */}
+                        </div>
+                    </>
+                )}
             </motion.div>
+            
+            {/* Copilot Button - Mobile */}
+            {isMobile && (
+                <motion.div className="flex flex-col items-center justify-center">
+                    <motion.button
+                        className={`w-12 h-12 flex items-center justify-center rounded-lg ${state.copilotOpen ? 'bg-white/20' : ''}`}
+                        variants={iconVariants}
+                        initial="idle"
+                        whileHover="hover"
+                        whileTap="tap"
+                        onClick={toggleCopilot}
+                    >
+                        <img
+                            src="/icon/copilot.svg"
+                            alt="Copilot"
+                            className="w-6 h-6"
+                        />
+                    </motion.button>
+                    <span className="text-xs text-white/70 mt-1">Copilot</span>
+                </motion.div>
+            )}
 
-            {/* System Controls */}
-            <motion.div
-                className="flex items-center h-10 bg-white/5 backdrop-blur-md backdrop-saturate-150 rounded-lg border border-white/10 shadow-lg shadow-black/20 px-1.5 mx-0.5 gap-1"
-                whileHover={{ backdropFilter: "blur(20px) saturate(150%) brightness(120%)" }}
-                transition={{ duration: 0.2 }}
-            >
-                {/* WiFi */}
-                <motion.button
-                    className="w-5 h-5 flex items-center justify-center"
-                    variants={iconVariants}
-                    initial="idle"
-                    whileHover="hover"
-                    whileTap="tap"
+            {/* System Controls - Desktop only */}
+            {!isMobile && (
+                <motion.div
+                    className="flex items-center h-10 bg-white/5 backdrop-blur-md backdrop-saturate-150 rounded-lg border border-white/10 shadow-lg shadow-black/20 px-1.5 mx-0.5 gap-1"
+                    whileHover={{ backdropFilter: "blur(20px) saturate(150%) brightness(120%)" }}
+                    transition={{ duration: 0.2 }}
                 >
-                    <Wifi className="w-4 h-4 text-white/80" />
-                </motion.button>
+                    {/* WiFi */}
+                    <motion.button
+                        className="w-5 h-5 flex items-center justify-center"
+                        variants={iconVariants}
+                        initial="idle"
+                        whileHover="hover"
+                        whileTap="tap"
+                    >
+                        <Wifi className="w-4 h-4 text-white/80" />
+                    </motion.button>
 
-                {/* Bluetooth */}
-                <motion.button
-                    className="w-5 h-5 flex items-center justify-center"
-                    variants={iconVariants}
-                    initial="idle"
-                    whileHover="hover"
-                    whileTap="tap"
-                >
-                    <Bluetooth className="w-4 h-4 text-white/80" />
-                </motion.button>
+                    {/* Bluetooth */}
+                    <motion.button
+                        className="w-5 h-5 flex items-center justify-center"
+                        variants={iconVariants}
+                        initial="idle"
+                        whileHover="hover"
+                        whileTap="tap"
+                    >
+                        <Bluetooth className="w-4 h-4 text-white/80" />
+                    </motion.button>
 
-                {/* Control Center */}
-                <motion.button
-                    className="w-5 h-5 flex items-center justify-center"
-                    variants={iconVariants}
-                    initial="idle"
-                    whileHover="hover"
-                    whileTap="tap"
-                >
-                    <Settings className="w-4 h-4 text-white/80" />
-                </motion.button>
-            </motion.div>
+                    {/* Control Center */}
+                    <motion.button
+                        className="w-5 h-5 flex items-center justify-center"
+                        variants={iconVariants}
+                        initial="idle"
+                        whileHover="hover"
+                        whileTap="tap"
+                    >
+                        <Settings className="w-4 h-4 text-white/80" />
+                    </motion.button>
+                </motion.div>
+            )}
 
             {/* Theme Toggle */}
             <motion.div
-                className={`relative w-10 h-10 bg-white/5 backdrop-blur-md backdrop-saturate-150 rounded-lg border border-white/10 shadow-lg shadow-black/20 mx-0.5 overflow-hidden ${state.theme === 'dark' ? 'dk' : ''}`}
-                whileHover={{ backdropFilter: "blur(20px) saturate(150%) brightness(120%)" }}
+                className={`${
+                    isMobile 
+                        ? 'flex flex-col items-center justify-center' 
+                        : `relative w-10 h-10 bg-white/5 backdrop-blur-md backdrop-saturate-150 rounded-lg border border-white/10 shadow-lg shadow-black/20 mx-0.5 overflow-hidden ${state.theme === 'dark' ? 'dk' : ''}`
+                }`}
+                whileHover={!isMobile ? { backdropFilter: "blur(20px) saturate(150%) brightness(120%)" } : {}}
                 transition={{ duration: 0.2 }}
             >
                 <motion.button
-                    className="w-full h-full flex items-center justify-center"
+                    className={`${
+                        isMobile 
+                            ? 'w-12 h-12 flex flex-col items-center justify-center rounded-lg' 
+                            : 'w-full h-full flex items-center justify-center'
+                    }`}
                     onClick={toggleTheme}
                     variants={iconVariants}
                     initial="idle"
@@ -206,47 +284,54 @@ export default function Taskbar() {
                 >
                     {/* Light Theme Icon */}
                     <motion.div
-                        className="absolute"
-                        animate={{
+                        className={isMobile ? '' : 'absolute'}
+                        animate={isMobile ? {} : {
                             x: state.theme === 'dark' ? -30 : 0,
                             opacity: state.theme === 'dark' ? 0 : 1
                         }}
                         transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+                        style={{ display: isMobile && state.theme === 'dark' ? 'none' : 'block' }}
                     >
-                        <Sun className="w-5 h-5 text-yellow-400" />
+                        <Sun className={`${isMobile ? 'w-6 h-6' : 'w-5 h-5'} text-yellow-400`} />
                     </motion.div>
 
                     {/* Dark Theme Icon */}
                     <motion.div
-                        className="absolute"
-                        animate={{
+                        className={isMobile ? '' : 'absolute'}
+                        animate={isMobile ? {} : {
                             x: state.theme === 'dark' ? 0 : 40,
                             opacity: state.theme === 'dark' ? 1 : 0
                         }}
                         transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+                        style={{ display: isMobile && state.theme === 'light' ? 'none' : 'block' }}
                     >
-                        <Moon className="w-5 h-5 text-blue-400" />
+                        <Moon className={`${isMobile ? 'w-6 h-6' : 'w-5 h-5'} text-blue-400`} />
                     </motion.div>
                 </motion.button>
+                {isMobile && (
+                    <span className="text-xs text-white/70 mt-1">Theme</span>
+                )}
             </motion.div>
 
-            {/* Date/Time Section */}
-            <motion.div
-                className="flex flex-col items-center justify-center h-10 bg-white/5 backdrop-blur-md backdrop-saturate-150 rounded-lg border border-white/10 shadow-lg shadow-black/20 px-3 mx-0.5 min-w-[100px] text-center cursor-pointer"
-                whileHover={{
-                    backdropFilter: "blur(20px) saturate(150%) brightness(120%)",
-                    scale: 1.02
-                }}
-                whileTap={{ scale: 0.98 }}
-                transition={{ duration: 0.2 }}
-            >
-                <div className="text-xs font-medium text-white leading-tight">
-                    {getCurrentTime()}
-                </div>
-                <div className="text-xs text-white/70 leading-tight">
-                    {getCurrentDate()}
-                </div>
-            </motion.div>
+            {/* Date/Time Section - Desktop only */}
+            {!isMobile && (
+                <motion.div
+                    className="flex flex-col items-center justify-center h-10 bg-white/5 backdrop-blur-md backdrop-saturate-150 rounded-lg border border-white/10 shadow-lg shadow-black/20 px-3 mx-0.5 min-w-[100px] text-center cursor-pointer"
+                    whileHover={{
+                        backdropFilter: "blur(20px) saturate(150%) brightness(120%)",
+                        scale: 1.02
+                    }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ duration: 0.2 }}
+                >
+                    <div className="text-xs font-medium text-white leading-tight">
+                        {getCurrentTime()}
+                    </div>
+                    <div className="text-xs text-white/70 leading-tight">
+                        {getCurrentDate()}
+                    </div>
+                </motion.div>
+            )}
         </motion.div>
     );
-} 
+}

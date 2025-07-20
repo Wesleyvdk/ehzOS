@@ -36,6 +36,9 @@ const Widgets: React.FC<WidgetsProps> = ({ isVisible, onClose }) => {
     const [operation, setOperation] = useState<string | null>(null);
     const [waitingForOperand, setWaitingForOperand] = useState(false);
 
+    // Mobile detection state
+    const [isMobile, setIsMobile] = useState(false);
+
     // System monitor state
     const [systemStats, setSystemStats] = useState({
         cpu: 45,
@@ -47,6 +50,20 @@ const Widgets: React.FC<WidgetsProps> = ({ isVisible, onClose }) => {
     // News state
     const [newsArticles, setNewsArticles] = useState<NewsArticle[]>([]);
     const [newsLoading, setNewsLoading] = useState(false);
+
+    // Mobile detection
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth <= 768);
+        };
+        
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        
+        return () => {
+            window.removeEventListener('resize', checkMobile);
+        };
+    }, []);
 
     // Update system stats every 2 seconds
     useEffect(() => {
@@ -351,11 +368,20 @@ const Widgets: React.FC<WidgetsProps> = ({ isVisible, onClose }) => {
         <AnimatePresence>
             {isVisible && (
                 <motion.div
-                    initial={{ opacity: 0, y: 50 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 50 }}
+                    initial={{ 
+                        opacity: 0, 
+                        ...(isMobile ? { scale: 0.9 } : { y: 50 })
+                    }}
+                    animate={{ 
+                        opacity: 1, 
+                        ...(isMobile ? { scale: 1 } : { y: 0 })
+                    }}
+                    exit={{ 
+                        opacity: 0, 
+                        ...(isMobile ? { scale: 0.9 } : { y: 50 })
+                    }}
                     transition={{ duration: 0.3, ease: [0.9, 0, 0.1, 1] }}
-                    className={`widgets-panel ${state.theme === 'dark' ? 'dark' : ''}`}
+                    className={`widgets-panel ${state.theme === 'dark' ? 'dark' : ''} ${isMobile ? 'mobile-fullscreen' : ''}`}
                     onClick={(e) => e.stopPropagation()}
                 >
                     <div className="widgets-section">
@@ -421,18 +447,19 @@ const Widgets: React.FC<WidgetsProps> = ({ isVisible, onClose }) => {
                         onClick={onClose}
                         style={{
                             position: 'absolute',
-                            top: '10px',
-                            right: '10px',
+                            top: isMobile ? '20px' : '10px',
+                            right: isMobile ? '20px' : '10px',
                             background: 'rgba(255, 255, 255, 0.8)',
                             borderRadius: '50%',
-                            width: '32px',
-                            height: '32px',
+                            width: isMobile ? '40px' : '32px',
+                            height: isMobile ? '40px' : '32px',
                             display: 'flex',
                             alignItems: 'center',
-                            justifyContent: 'center'
+                            justifyContent: 'center',
+                            zIndex: 1000
                         }}
                     >
-                        <X size={16} />
+                        <X size={isMobile ? 20 : 16} />
                     </button>
                 </motion.div>
             )}
@@ -440,4 +467,4 @@ const Widgets: React.FC<WidgetsProps> = ({ isVisible, onClose }) => {
     );
 };
 
-export default Widgets; 
+export default Widgets;

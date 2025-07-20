@@ -23,6 +23,19 @@ const StartMenu: React.FC<StartMenuProps> = ({ isVisible, onClose }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [currentTime, setCurrentTime] = useState(new Date());
     const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+    const [isMobile, setIsMobile] = useState(false);
+
+    // Check if device is mobile
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth <= 768);
+        };
+        
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -169,13 +182,22 @@ const StartMenu: React.FC<StartMenuProps> = ({ isVisible, onClose }) => {
                         onClick={onClose}
                     />
                     <motion.div
-                        initial={{ opacity: 0, y: 650 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 650 }}
-                        transition={{ duration: 0.2, ease: [0.9, 0, 0.1, 1] }}
-                        className={`start-menu ${isMaximized ? 'max' : ''} ${state.theme === 'dark' ? 'dark' : ''}`}
+                        initial={isMobile ? { opacity: 0, scale: 0.9 } : { opacity: 0, y: 650 }}
+                        animate={isMobile ? { opacity: 1, scale: 1 } : { opacity: 1, y: 0 }}
+                        exit={isMobile ? { opacity: 0, scale: 0.9 } : { opacity: 0, y: 650 }}
+                        transition={{ duration: isMobile ? 0.3 : 0.2, ease: [0.9, 0, 0.1, 1] }}
+                        className={`start-menu ${isMaximized || isMobile ? 'max' : ''} ${state.theme === 'dark' ? 'dark' : ''}`}
                         onClick={(e) => e.stopPropagation()}
                     >
+                        {/* Mobile Close Button */}
+                        {isMobile && (
+                            <button
+                                className="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-md border border-white/20"
+                                onClick={onClose}
+                            >
+                                <span className="text-white text-xl">×</span>
+                            </button>
+                        )}
                         {/* Left Section */}
                         <div id="s-m-l">
                             {/* User Profile */}
@@ -330,4 +352,4 @@ const StartMenu: React.FC<StartMenuProps> = ({ isVisible, onClose }) => {
     );
 };
 
-export default StartMenu; 
+export default StartMenu;

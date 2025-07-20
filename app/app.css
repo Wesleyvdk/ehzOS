@@ -1113,8 +1113,58 @@ html {
     box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
 }
 
-/* Responsive design */
+/* Mobile Grid Layout for Desktop Icons */
+.mobile-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    padding: 20px 16px 80px 16px;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.desktop-absolute {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* Mobile taskbar styles */
 @media (max-width: 768px) {
+    .mobile-taskbar {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(20px);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 8px 16px;
+    }
+    
+    .mobile-taskbar-button {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+    }
+    
+    .mobile-taskbar-button:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .mobile-taskbar-label {
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.7);
+        margin-top: 4px;
+        text-align: center;
+    }
+}
+
+/* Mobile-First Responsive Design - Windows 12 Mobile Style */
+@media (max-width: 768px) {
+    /* Hide desktop elements */
     .desktop-mode {
         display: none;
     }
@@ -1123,18 +1173,372 @@ html {
         display: block;
     }
 
-    #dock-box {
-        padding: 0 2px;
+    /* Mobile body adjustments */
+    body {
+        font-size: 14px;
+        overflow-x: hidden;
+        overflow-y: auto;
     }
 
-    .taskbar {
-        height: 60px;
-        padding: 0 16px;
+    /* Mobile desktop - full screen scrollable */
+    #desktop {
+        position: relative;
+        height: 100vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 20px 16px 80px 16px;
+        background: var(--bgul) center/cover fixed;
     }
 
+    /* Mobile desktop icons - grid layout */
+    .desktop-icon {
+        position: relative !important;
+        width: calc(25% - 12px);
+        height: 80px;
+        margin: 6px;
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s ease;
+    }
+
+    .desktop-icon:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: scale(1.05);
+    }
+
+    .desktop-icon img {
+        width: 32px !important;
+        height: 32px !important;
+        margin-bottom: 4px;
+    }
+
+    /* Mobile taskbar - bottom dock style */
+    .taskbar,
+    .fixed.bottom-2\.5 {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 70px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(30px) saturate(180%);
+        border-top: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 0;
+        padding: 8px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        z-index: 100;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Mobile dock sections */
+    .fixed.bottom-2\.5 > div {
+        background: rgba(255, 255, 255, 0.15) !important;
+        backdrop-filter: blur(20px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        border-radius: 20px !important;
+        height: 50px !important;
+        padding: 0 12px !important;
+        margin: 0 4px !important;
+    }
+
+    /* Mobile start menu - full screen overlay */
+    .start-menu {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        max-height: 100% !important;
+        border-radius: 0 !important;
+        background: rgba(0, 0, 0, 0.95) !important;
+        backdrop-filter: blur(40px) saturate(180%) !important;
+        padding: 20px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        z-index: 200 !important;
+    }
+
+    .start-menu.dark {
+        background: rgba(0, 0, 0, 0.98) !important;
+    }
+
+    /* Mobile start menu layout */
+    #s-m-l {
+        min-width: 100% !important;
+        width: 100% !important;
+        padding: 0 !important;
+        margin-bottom: 20px !important;
+    }
+
+    #s-m-r {
+        flex-grow: 1 !important;
+        padding: 0 !important;
+    }
+
+    /* Mobile user section */
+    #s-m-user {
+        padding: 20px 0 !important;
+        margin-bottom: 20px !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    #s-m-user svg {
+        width: 60px !important;
+        height: 60px !important;
+    }
+
+    /* Mobile search */
+    .search-container {
+        margin-bottom: 30px !important;
+    }
+
+    .search-container .input {
+        padding: 16px 20px !important;
+        font-size: 16px !important;
+        border-radius: 25px !important;
+        background: rgba(255, 255, 255, 0.1) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+
+    /* Mobile apps list */
+    .apps-list {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .apps-list .app-item {
+        padding: 16px 20px !important;
+        font-size: 16px !important;
+        border-radius: 16px !important;
+        margin-bottom: 8px !important;
+        background: rgba(255, 255, 255, 0.05) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+
+    .apps-list .app-item img {
+        width: 36px !important;
+        height: 36px !important;
+        margin-right: 16px !important;
+    }
+
+    /* Mobile recommended apps grid */
+    .row1 {
+        flex-direction: column !important;
+        gap: 20px !important;
+    }
+
+    .folder {
+        display: grid !important;
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 12px !important;
+        padding: 20px !important;
+        background: rgba(255, 255, 255, 0.05) !important;
+        border-radius: 20px !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+
+    .folder .sm-app {
+        min-width: auto !important;
+        width: 100% !important;
+        aspect-ratio: 1 !important;
+        padding: 12px !important;
+        background: rgba(255, 255, 255, 0.1) !important;
+        border-radius: 16px !important;
+    }
+
+    .folder .sm-app img {
+        width: 28px !important;
+        height: 28px !important;
+    }
+
+    .folder .sm-app p {
+        font-size: 11px !important;
+        margin-top: 4px !important;
+    }
+
+    /* Mobile tool section */
+    .tool {
+        width: 100% !important;
+        padding: 20px !important;
+        background: rgba(255, 255, 255, 0.05) !important;
+        border-radius: 20px !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        align-items: center !important;
+        text-align: center !important;
+    }
+
+    .tool .time {
+        font-size: 32px !important;
+        margin-bottom: 4px !important;
+    }
+
+    .tool .date {
+        font-size: 14px !important;
+    }
+
+    /* Mobile windows - full screen */
+    .window {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        border-radius: 0 !important;
+        border: none !important;
+        z-index: 150 !important;
+    }
+
+    /* Mobile widgets panel */
+    .widgets-panel {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 70px !important;
+        background: rgba(0, 0, 0, 0.95) !important;
+        backdrop-filter: blur(40px) !important;
+        z-index: 180 !important;
+        padding: 20px !important;
+        overflow-y: auto !important;
+    }
+
+    /* Mobile window styles */
+    .window {
+        border-radius: 16px !important;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+
+    .window-titlebar {
+        background: rgba(255, 255, 255, 0.1) !important;
+        backdrop-filter: blur(20px) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+
+    .window-control {
+        width: 28px !important;
+        height: 28px !important;
+        border-radius: 6px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        transition: all 0.2s ease !important;
+    }
+
+    .window-control:hover {
+        background: rgba(255, 255, 255, 0.2) !important;
+    }
+
+    .window-control.close:hover {
+        background: rgba(255, 59, 48, 0.8) !important;
+    }
+
+    /* Mobile copilot panel */
+    .copilot-panel {
+        position: fixed !important;
+        top: 0 !important;
+        right: 0 !important;
+        bottom: 70px !important;
+        width: 100% !important;
+        background: rgba(0, 0, 0, 0.95) !important;
+        backdrop-filter: blur(40px) !important;
+        z-index: 180 !important;
+        padding: 20px !important;
+    }
+
+    /* Mobile context menu */
+    .context-menu {
+        position: fixed !important;
+        bottom: 80px !important;
+        left: 16px !important;
+        right: 16px !important;
+        top: auto !important;
+        background: rgba(255, 255, 255, 0.1) !important;
+        backdrop-filter: blur(30px) !important;
+        border-radius: 20px !important;
+        padding: 16px !important;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    /* Mobile glass effects */
     .glass-strong {
-        backdrop-filter: blur(15px);
-        -webkit-backdrop-filter: blur(15px);
+        backdrop-filter: blur(30px) saturate(180%);
+        -webkit-backdrop-filter: blur(30px) saturate(180%);
+    }
+
+    /* Mobile typography */
+    .text {
+        font-size: 18px !important;
+        font-weight: 600 !important;
+        margin: 16px 0 12px 0 !important;
+    }
+
+    /* Mobile button adjustments */
+    .btn {
+        padding: 14px 24px !important;
+        font-size: 16px !important;
+        border-radius: 12px !important;
+        min-height: 48px !important;
+    }
+
+    .btn-icon {
+        width: 48px !important;
+        height: 48px !important;
+        border-radius: 50% !important;
+    }
+
+    /* Mobile input adjustments */
+    .input {
+        padding: 16px 20px !important;
+        font-size: 16px !important;
+        border-radius: 12px !important;
+        min-height: 48px !important;
+    }
+
+    /* Hide desktop-specific elements on mobile */
+    .desktop-only {
+        display: none !important;
+    }
+
+    /* Mobile notification area */
+    .notification-area {
+        position: fixed;
+        top: 20px;
+        left: 16px;
+        right: 16px;
+        z-index: 300;
+        pointer-events: none;
+    }
+
+    /* Mobile status bar */
+    .mobile-status-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 24px;
+        background: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(20px);
+        z-index: 250;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 16px;
+        font-size: 12px;
+        color: white;
     }
 }
 

@@ -1,9 +1,22 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { useOS } from '../context/OSContext';
 import type { ContextMenuItem } from '../types/os';
 
 export default function Desktop() {
     const { state, openWindow, openContextMenu, closeContextMenu, toggleTheme, changeWallpaper } = useOS();
+    const [isMobile, setIsMobile] = useState(false);
+
+    // Check if device is mobile
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth <= 768);
+        };
+        
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     // Desktop icons (using Win12 style icons and layout)
     const desktopIcons = [
@@ -162,42 +175,72 @@ export default function Desktop() {
             onContextMenu={handleContextMenu}
             onClick={handleDesktopClick}
         >
-            {/* Desktop Icons - Win12 Style */}
-            {desktopIcons.map(icon => (
-                <div
-                    key={icon.id}
-                    className="absolute cursor-pointer select-none"
-                    style={{
-                        left: icon.position.x,
-                        top: icon.position.y,
-                        width: '80px',
-                        textAlign: 'center',
-                        color: 'var(--text)',
-                        fontSize: '12px',
-                        fontWeight: '500'
-                    }}
-                    onDoubleClick={(e) => {
-                        e.stopPropagation();
-                        icon.action();
-                    }}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = 'var(--hover)';
-                        e.currentTarget.style.borderRadius = '8px';
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                    }}
-                >
-                    {/* Icon Image */}
-                    <div className="mb-1 flex items-center justify-center h-12">
-                        {icon.iconPath ? (
-                            <img
-                                src={icon.iconPath}
-                                alt={icon.title}
-                                className="w-8 h-8"
-                                style={{
-                                    filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))',
-                                    transition: 'transform 80ms'
+            {/* Mobile Status Bar */}
+            <div className="mobile-status-bar md:hidden">
+                <div className="flex items-center gap-1">
+                    <span>12:00</span>
+                </div>
+                <div className="flex items-center gap-1">
+                    <span>📶</span>
+                    <span>📶</span>
+                    <span>🔋</span>
+                </div>
+            </div>
+
+            {/* Desktop Icons - Responsive Layout */}
+            <div className={`desktop-icons-container ${isMobile ? 'mobile-grid' : 'desktop-absolute'}`}>
+                {desktopIcons.map(icon => (
+                    <div
+                        key={icon.id}
+                        className="desktop-icon cursor-pointer select-none"
+                        style={{
+                            // Desktop positioning for larger screens
+                            ...(isMobile ? {} : {
+                                position: 'absolute',
+                                left: icon.position.x,
+                                top: icon.position.y,
+                                width: '80px'
+                            }),
+                            textAlign: 'center',
+                            color: 'var(--text)',
+                            fontSize: '12px',
+                            fontWeight: '500'
+                        }}
+                        onDoubleClick={(e) => {
+                            if (!isMobile) {
+                                e.stopPropagation();
+                                icon.action();
+                            }
+                        }}
+                        onClick={(e) => {
+                            // Mobile single tap to open
+                            if (isMobile) {
+                                e.stopPropagation();
+                                icon.action();
+                            }
+                        }}
+                        onMouseEnter={(e) => {
+                            if (!isMobile) {
+                                e.currentTarget.style.backgroundColor = 'var(--hover)';
+                                e.currentTarget.style.borderRadius = '8px';
+                            }
+                        }}
+                        onMouseLeave={(e) => {
+                            if (!isMobile) {
+                                e.currentTarget.style.backgroundColor = 'transparent';
+                            }
+                        }}
+                    >
+                        {/* Icon Image */}
+                        <div className="mb-1 flex items-center justify-center h-12">
+                            {icon.iconPath ? (
+                                <img
+                                    src={icon.iconPath}
+                                    alt={icon.title}
+                                    className="w-8 h-8 md:w-8 md:h-8"
+                                    style={{
+                                        filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))',
+                                        transition: 'transform 80ms'
                                 }}
                                 onMouseDown={(e) => {
                                     e.currentTarget.style.transform = 'scale(0.95)';
@@ -223,6 +266,7 @@ export default function Desktop() {
                     </div>
                 </div>
             ))}
+            </div>
 
             {/* Desktop selection area (hidden, for context menu) */}
             <div
@@ -263,4 +307,4 @@ export default function Desktop() {
             )} */}
         </div>
     );
-} 
+}

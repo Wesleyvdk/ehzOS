@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useOS } from '../../context/OSContext';
 import {
     User, Settings, Monitor, Palette, Shield, Wifi, Volume2,
@@ -19,6 +19,20 @@ export default function SettingsApp() {
     const { state, toggleTheme } = useOS();
     const [activeCategory, setActiveCategory] = useState('system');
     const [searchQuery, setSearchQuery] = useState('');
+    const [isMobile, setIsMobile] = useState(false);
+    const [showSidebar, setShowSidebar] = useState(true);
+
+    useEffect(() => {
+        const checkMobile = () => {
+            const mobile = window.innerWidth <= 768;
+            setIsMobile(mobile);
+            setShowSidebar(!mobile);
+        };
+        
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     const categories: SettingsCategory[] = [
         { id: 'system', label: 'System', icon: <Monitor className="w-5 h-5" />, enabled: true, available: true },
@@ -57,12 +71,12 @@ export default function SettingsApp() {
                 width: '100%',
                 color: 'var(--text)',
                 background: 'var(--card)',
-                marginBottom: '7px',
-                borderRadius: '8px',
+                marginBottom: isMobile ? '5px' : '7px',
+                borderRadius: isMobile ? '6px' : '8px',
                 boxShadow: '0 1px 2px 0px var(--shadow)',
                 textDecoration: 'none',
                 display: 'flex',
-                padding: '10px 15px',
+                padding: isMobile ? '8px 12px' : '10px 15px',
                 justifyContent: 'space-between',
                 transition: '100ms',
                 border: '2px solid transparent',
@@ -85,24 +99,24 @@ export default function SettingsApp() {
         >
             <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
                 <div style={{
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '8px',
+                    width: isMobile ? '32px' : '40px',
+                    height: isMobile ? '32px' : '40px',
+                    borderRadius: isMobile ? '6px' : '8px',
                     background: 'var(--bg-secondary)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    marginRight: '15px',
+                    marginRight: isMobile ? '12px' : '15px',
                     color: 'var(--accent)'
                 }}>
                     {icon}
                 </div>
                 <div>
-                    <div style={{ fontSize: '15px', fontWeight: '500', marginBottom: '2px' }}>
+                    <div style={{ fontSize: isMobile ? '14px' : '15px', fontWeight: '500', marginBottom: '2px' }}>
                         {title}
                     </div>
                     {description && (
-                        <div style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.3' }}>
+                        <div style={{ fontSize: isMobile ? '12px' : '13px', color: 'var(--text-secondary)', lineHeight: '1.3' }}>
                             {description}
                         </div>
                     )}
@@ -302,21 +316,21 @@ export default function SettingsApp() {
             />
             <div style={{
                 background: 'var(--card)',
-                borderRadius: '8px',
-                padding: '15px',
-                marginBottom: '7px',
+                borderRadius: isMobile ? '6px' : '8px',
+                padding: isMobile ? '12px' : '15px',
+                marginBottom: isMobile ? '5px' : '7px',
                 boxShadow: '0 1px 2px 0px var(--shadow)'
             }}>
-                <div style={{ fontSize: '15px', fontWeight: '500', marginBottom: '15px' }}>
+                <div style={{ fontSize: isMobile ? '14px' : '15px', fontWeight: '500', marginBottom: isMobile ? '12px' : '15px' }}>
                     Choose your mode
                 </div>
-                <div style={{ display: 'flex', gap: '10px' }}>
+                <div style={{ display: 'flex', gap: isMobile ? '8px' : '10px', flexDirection: isMobile ? 'column' : 'row' }}>
                     <div
                         onClick={() => state.theme !== 'light' && toggleTheme()}
                         style={{
                             flex: 1,
-                            padding: '20px',
-                            borderRadius: '8px',
+                            padding: isMobile ? '15px' : '20px',
+                            borderRadius: isMobile ? '6px' : '8px',
                             background: state.theme === 'light' ? 'var(--accent)' : 'var(--bg-secondary)',
                             color: state.theme === 'light' ? 'white' : 'var(--text)',
                             textAlign: 'center',
@@ -325,16 +339,16 @@ export default function SettingsApp() {
                             border: '2px solid ' + (state.theme === 'light' ? 'var(--accent)' : 'transparent')
                         }}
                     >
-                        <div style={{ fontSize: '24px', marginBottom: '8px' }}>☀️</div>
-                        <div style={{ fontWeight: '500' }}>Light</div>
-                        <div style={{ fontSize: '12px', opacity: 0.8 }}>Clean and bright interface</div>
+                        <div style={{ fontSize: isMobile ? '20px' : '24px', marginBottom: isMobile ? '6px' : '8px' }}>☀️</div>
+                        <div style={{ fontWeight: '500', fontSize: isMobile ? '14px' : '16px' }}>Light</div>
+                        <div style={{ fontSize: isMobile ? '11px' : '12px', opacity: 0.8 }}>Clean and bright interface</div>
                     </div>
                     <div
                         onClick={() => state.theme !== 'dark' && toggleTheme()}
                         style={{
                             flex: 1,
-                            padding: '20px',
-                            borderRadius: '8px',
+                            padding: isMobile ? '15px' : '20px',
+                            borderRadius: isMobile ? '6px' : '8px',
                             background: state.theme === 'dark' ? 'var(--accent)' : 'var(--bg-secondary)',
                             color: state.theme === 'dark' ? 'white' : 'var(--text)',
                             textAlign: 'center',
@@ -343,9 +357,9 @@ export default function SettingsApp() {
                             border: '2px solid ' + (state.theme === 'dark' ? 'var(--accent)' : 'transparent')
                         }}
                     >
-                        <div style={{ fontSize: '24px', marginBottom: '8px' }}>🌙</div>
-                        <div style={{ fontWeight: '500' }}>Dark</div>
-                        <div style={{ fontSize: '12px', opacity: 0.8 }}>Easy on the eyes</div>
+                        <div style={{ fontSize: isMobile ? '20px' : '24px', marginBottom: isMobile ? '6px' : '8px' }}>🌙</div>
+                        <div style={{ fontWeight: '500', fontSize: isMobile ? '14px' : '16px' }}>Dark</div>
+                        <div style={{ fontSize: isMobile ? '11px' : '12px', opacity: 0.8 }}>Easy on the eyes</div>
                     </div>
                 </div>
             </div>
@@ -436,20 +450,65 @@ export default function SettingsApp() {
             display: 'flex',
             background: 'var(--bg)',
             color: 'var(--text)',
-            fontFamily: 'system-ui, -apple-system, sans-serif'
+            fontFamily: 'system-ui, -apple-system, sans-serif',
+            position: 'relative'
         }}>
+            {/* Mobile Header */}
+            {isMobile && (
+                <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: '50px',
+                    background: 'var(--card)',
+                    borderBottom: '1px solid var(--border)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '0 15px',
+                    zIndex: 1000
+                }}>
+                    <button
+                        onClick={() => setShowSidebar(!showSidebar)}
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            color: 'var(--text)',
+                            fontSize: '18px',
+                            cursor: 'pointer',
+                            marginRight: '15px'
+                        }}
+                    >
+                        ☰
+                    </button>
+                    <h1 style={{
+                        fontSize: '18px',
+                        margin: 0,
+                        color: 'var(--text)'
+                    }}>
+                        {categories.find(cat => cat.id === activeCategory)?.label || 'Settings'}
+                    </h1>
+                </div>
+            )}
+
             {/* Sidebar Menu */}
             <div style={{
-                width: '30%',
-                minWidth: '280px',
+                width: isMobile ? (showSidebar ? '100%' : '0') : '30%',
+                minWidth: isMobile ? 'auto' : '280px',
                 overflow: 'hidden',
-                padding: '3px 5px 5px 15px',
-                borderRight: '1px solid var(--border)'
+                padding: isMobile ? (showSidebar ? '60px 15px 15px 15px' : '0') : '3px 5px 5px 15px',
+                borderRight: isMobile ? 'none' : '1px solid var(--border)',
+                position: isMobile ? 'absolute' : 'relative',
+                height: isMobile ? '100%' : 'auto',
+                background: isMobile ? 'var(--bg)' : 'transparent',
+                zIndex: isMobile ? 999 : 'auto',
+                transition: 'width 0.3s ease',
+                display: isMobile && !showSidebar ? 'none' : 'block'
             }}>
                 {/* User Profile */}
                 <div style={{
                     display: 'flex',
-                    padding: '10px 10px',
+                    padding: isMobile ? '8px' : '10px 10px',
                     borderRadius: '10px',
                     marginBottom: '10px',
                     alignItems: 'center',
@@ -464,11 +523,11 @@ export default function SettingsApp() {
                     }}>
                     <div style={{
                         backgroundColor: 'var(--bg-secondary)',
-                        width: '60px',
-                        minWidth: '60px',
-                        height: '60px',
+                        width: isMobile ? '50px' : '60px',
+                        minWidth: isMobile ? '50px' : '60px',
+                        height: isMobile ? '50px' : '60px',
                         borderRadius: '50%',
-                        padding: '11px',
+                        padding: isMobile ? '9px' : '11px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center'
@@ -482,7 +541,7 @@ export default function SettingsApp() {
                         whiteSpace: 'nowrap'
                     }}>
                         <p style={{
-                            fontSize: '19px',
+                            fontSize: isMobile ? '16px' : '19px',
                             marginBottom: '-7px',
                             margin: 0
                         }}>
@@ -492,7 +551,7 @@ export default function SettingsApp() {
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
                             whiteSpace: 'nowrap',
-                            fontSize: '15px',
+                            fontSize: isMobile ? '13px' : '15px',
                             margin: 0,
                             color: 'var(--text-secondary)'
                         }}>
@@ -544,7 +603,14 @@ export default function SettingsApp() {
                     {filteredCategories.map((category) => (
                         <div
                             key={category.id}
-                            onClick={() => category.enabled && setActiveCategory(category.id)}
+                            onClick={() => {
+                                if (category.enabled) {
+                                    setActiveCategory(category.id);
+                                    if (isMobile) {
+                                        setShowSidebar(false);
+                                    }
+                                }
+                            }}
                             style={{
                                 padding: '5px 10px 5px 20px',
                                 fontSize: '15px',
@@ -592,9 +658,10 @@ export default function SettingsApp() {
             <div style={{
                 flexGrow: 1,
                 overflow: 'hidden',
-                paddingLeft: '15px',
+                paddingLeft: isMobile ? '10px' : '15px',
                 paddingRight: '5px',
-                margin: '2px 0 0 0'
+                margin: isMobile ? '50px 0 0 0' : '2px 0 0 0',
+                display: isMobile && showSidebar ? 'none' : 'block'
             }}>
                 <div style={{
                     overflowY: 'scroll',
@@ -604,9 +671,9 @@ export default function SettingsApp() {
                     display: 'block'
                 }}>
                     <h1 style={{
-                        fontSize: '29px',
-                        padding: '10px 5px 10px 5px',
-                        display: 'block',
+                        fontSize: isMobile ? '20px' : '29px',
+                        padding: isMobile ? '10px 5px' : '10px 5px 10px 5px',
+                        display: isMobile ? 'none' : 'block',
                         margin: 0,
                         color: 'var(--text)'
                     }}>
@@ -617,4 +684,4 @@ export default function SettingsApp() {
             </div>
         </div>
     );
-} 
+}

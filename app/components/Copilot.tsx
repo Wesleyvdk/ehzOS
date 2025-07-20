@@ -25,6 +25,7 @@ const Copilot: React.FC<CopilotProps> = ({ isVisible, onClose }) => {
     const [inputValue, setInputValue] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isInitialized, setIsInitialized] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
     const chatRef = useRef<HTMLDivElement>(null);
 
     // Initialize Copilot
@@ -218,6 +219,20 @@ Try saying "open projects" or "switch theme" to get started!`;
         };
     };
 
+    // Mobile detection
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth <= 768);
+        };
+        
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        
+        return () => {
+            window.removeEventListener('resize', checkMobile);
+        };
+    }, []);
+
     // Scroll to bottom when new messages arrive
     useEffect(() => {
         if (chatRef.current) {
@@ -238,40 +253,53 @@ Try saying "open projects" or "switch theme" to get started!`;
             {isVisible && (
                 <motion.div
                     id="copilot"
-                    initial={{ opacity: 0, x: 410 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 410 }}
+                    initial={{ 
+                        opacity: 0, 
+                        ...(isMobile ? { scale: 0.9 } : { x: 410 })
+                    }}
+                    animate={{ 
+                        opacity: 1, 
+                        ...(isMobile ? { scale: 1 } : { x: 0 })
+                    }}
+                    exit={{ 
+                        opacity: 0, 
+                        ...(isMobile ? { scale: 0.9 } : { x: 410 })
+                    }}
                     transition={{ duration: 0.3, ease: [0.9, 0, 0.1, 1] }}
-                    className="fixed right-2 top-2 w-96 h-[calc(100vh-80px)] bg-var(--bg70) backdrop-blur-[60px] saturate-[3] contrast-[0.6] rounded-xl shadow-2xl z-50 overflow-hidden flex flex-col border-2 border-[#6f6f6f30]"
+                    className={`${
+                        isMobile 
+                            ? 'fixed inset-0 w-full h-full bg-var(--bg) z-[9999]' 
+                            : 'fixed right-2 top-2 w-96 h-[calc(100vh-80px)] bg-var(--bg70) backdrop-blur-[60px] saturate-[3] contrast-[0.6] rounded-xl shadow-2xl z-50 border-2 border-[#6f6f6f30]'
+                    } overflow-hidden flex flex-col`}
                 >
                     {/* Title bar */}
-                    <div className="titbar h-10 flex items-center px-3 min-h-10">
-                        <p className="text text-lg font-medium">ehzOS 12 Copilot</p>
+                    <div className={`titbar ${isMobile ? 'h-14 px-4' : 'h-10 px-3'} flex items-center min-h-10`}>
+                        <p className={`text ${isMobile ? 'text-xl' : 'text-lg'} font-medium`}>ehzOS 12 Copilot</p>
                         <div className="alr flex-1 flex justify-end gap-1">
                             <button
-                                className="btn w-8 h-8 flex items-center justify-center rounded hover:bg-var(--hover) transition-colors"
+                                className={`btn ${isMobile ? 'w-10 h-10' : 'w-8 h-8'} flex items-center justify-center rounded hover:bg-var(--hover) transition-colors`}
                                 onClick={() => alert('ehzOS AI Copilot 3.0 - Supports app management and theme switching')}
                             >
-                                <Info className="w-4 h-4" />
+                                <Info className={`${isMobile ? 'w-5 h-5' : 'w-4 h-4'}`} />
                             </button>
                             <button
-                                className="btn hide w-8 h-8 flex items-center justify-center rounded hover:bg-var(--hover) transition-colors"
+                                className={`btn hide ${isMobile ? 'w-10 h-10' : 'w-8 h-8'} flex items-center justify-center rounded hover:bg-var(--hover) transition-colors`}
                                 onClick={onClose}
                             >
-                                <ChevronRight className="w-4 h-4" />
+                                <ChevronRight className={`${isMobile ? 'w-5 h-5' : 'w-4 h-4'}`} />
                             </button>
                         </div>
                     </div>
 
                     {/* Promotional banner */}
-                    <div className="px-4 py-2 bg-gradient-to-r from-[#bd68e8] to-[#2a489c] text-white text-sm">
+                    <div className={`${isMobile ? 'px-4 py-3 text-base' : 'px-4 py-2 text-sm'} bg-gradient-to-r from-[#bd68e8] to-[#2a489c] text-white`}>
                         AI Copilot 3.0 now available with app management and system control
                     </div>
 
                     {/* Chat area */}
                     <div
                         ref={chatRef}
-                        className="chat flex-1 p-4 overflow-y-auto overflow-x-hidden scroll-smooth"
+                        className={`chat flex-1 ${isMobile ? 'p-4 pb-20' : 'p-4'} overflow-y-auto overflow-x-hidden scroll-smooth`}
                     >
                         {!isInitialized ? (
                             <div className="flex flex-col items-center justify-center h-full">
@@ -328,22 +356,22 @@ Try saying "open projects" or "switch theme" to get started!`;
 
                     {/* Input area */}
                     {isInitialized && (
-                        <div className="inputbox p-4 border-t border-var(--bd) bg-var(--bg50)">
+                        <div className={`inputbox ${isMobile ? 'p-4 pb-6' : 'p-4'} border-t border-var(--bd) bg-var(--bg50) ${isMobile ? 'fixed bottom-0 left-0 right-0' : ''}`}>
                             <div className="flex gap-2 items-end">
                                 <textarea
                                     value={inputValue}
                                     onChange={(e) => setInputValue(e.target.value)}
                                     onKeyPress={handleKeyPress}
                                     placeholder="Ask me anything..."
-                                    className="input flex-1 px-3 py-2 border border-var(--bd) rounded-lg bg-var(--bg) text-var(--text) text-sm outline-none transition-colors resize-none min-h-[40px] max-h-[120px]"
+                                    className={`input flex-1 px-3 py-2 border border-var(--bd) rounded-lg bg-var(--bg) text-var(--text) ${isMobile ? 'text-base' : 'text-sm'} outline-none transition-colors resize-none ${isMobile ? 'min-h-[44px] max-h-[120px]' : 'min-h-[40px] max-h-[120px]'}`}
                                     disabled={isLoading}
                                 />
                                 <button
                                     onClick={() => sendMessage(inputValue)}
                                     disabled={!inputValue.trim() || isLoading}
-                                    className="send w-10 h-10 bg-var(--theme-2) text-white rounded-full flex items-center justify-center hover:bg-var(--theme-1) transition-colors disabled:bg-var(--hover) disabled:text-var(--text2) disabled:cursor-not-allowed"
+                                    className={`send ${isMobile ? 'w-12 h-12' : 'w-10 h-10'} bg-var(--theme-2) text-white rounded-full flex items-center justify-center hover:bg-var(--theme-1) transition-colors disabled:bg-var(--hover) disabled:text-var(--text2) disabled:cursor-not-allowed`}
                                 >
-                                    <Send className="w-4 h-4" />
+                                    <Send className={`${isMobile ? 'w-5 h-5' : 'w-4 h-4'}`} />
                                 </button>
                             </div>
                         </div>
@@ -354,4 +382,4 @@ Try saying "open projects" or "switch theme" to get started!`;
     );
 };
 
-export default Copilot; 
+export default Copilot;

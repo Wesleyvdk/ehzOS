@@ -3,7 +3,9 @@ import {
     Folder, File, Image, Music, Video, FileText, Settings, Download,
     Home, HardDrive, Trash2, Search, ArrowLeft, ArrowRight, ArrowUp,
     Grid, List, MoreHorizontal, ChevronRight, Star, Tag, User,
-    FolderOpen, Monitor, Smartphone, Camera, Headphones
+    FolderOpen, Monitor, Smartphone, Camera, Headphones, Menu,
+    ChevronUp,
+    ChevronLeft
 } from 'lucide-react';
 
 interface FileItem {
@@ -28,6 +30,20 @@ export default function FileExplorerApp() {
     const [searchQuery, setSearchQuery] = useState('');
     const [history, setHistory] = useState<string[]>(['This PC']);
     const [historyIndex, setHistoryIndex] = useState(0);
+    const [isMobile, setIsMobile] = useState(false);
+    const [showSidebar, setShowSidebar] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth <= 768);
+            if (window.innerWidth > 768) {
+                setShowSidebar(false);
+            }
+        };
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     const folderStructure: FolderStructure = {
         'This PC': [
@@ -151,17 +167,62 @@ export default function FileExplorerApp() {
             display: 'flex',
             background: 'var(--bg)',
             color: 'var(--text)',
-            fontFamily: 'system-ui, -apple-system, sans-serif'
+            fontFamily: 'system-ui, -apple-system, sans-serif',
+            position: 'relative'
         }}>
+            {/* Mobile Header */}
+            {isMobile && (
+                <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: '50px',
+                    background: 'var(--bg-secondary)',
+                    borderBottom: '1px solid var(--border)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '0 16px',
+                    zIndex: 1000
+                }}>
+                    <button
+                        onClick={() => setShowSidebar(!showSidebar)}
+                        style={{
+                            padding: '8px',
+                            borderRadius: '4px',
+                            border: 'none',
+                            background: 'var(--card)',
+                            color: 'var(--text)',
+                            cursor: 'pointer',
+                            marginRight: '12px'
+                        }}
+                    >
+                        <Menu className="w-4 h-4" />
+                    </button>
+                    <span style={{
+                        fontSize: '16px',
+                        fontWeight: '500',
+                        color: 'var(--text)'
+                    }}>
+                        File Explorer
+                    </span>
+                </div>
+            )}
+
             {/* Sidebar */}
             <div style={{
-                width: '200px',
+                width: isMobile ? (showSidebar ? '280px' : '0') : '200px',
                 background: 'var(--bg)',
                 borderRight: '1px solid var(--border)',
-                padding: '10px',
+                padding: isMobile && !showSidebar ? '0' : '10px',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '20px'
+                gap: '20px',
+                position: isMobile ? 'absolute' : 'relative',
+                height: isMobile ? '100%' : 'auto',
+                zIndex: isMobile ? 999 : 'auto',
+                transition: isMobile ? 'width 0.3s ease' : 'none',
+                overflow: 'hidden'
             }}>
                 {/* Quick Access */}
                 <div style={{
@@ -226,18 +287,24 @@ export default function FileExplorerApp() {
                         {sidebarItems.map((item) => (
                             <div
                                 key={item.id}
-                                onClick={() => navigateToFolder(item.path)}
+                                onClick={() => {
+                                    navigateToFolder(item.path);
+                                    if (isMobile) {
+                                        setShowSidebar(false);
+                                    }
+                                }}
                                 style={{
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '8px',
-                                    padding: '6px 8px',
+                                    padding: isMobile ? '10px 12px' : '6px 8px',
                                     borderRadius: '4px',
                                     cursor: 'pointer',
-                                    fontSize: '13px',
+                                    fontSize: isMobile ? '15px' : '13px',
                                     color: 'var(--text)',
                                     background: currentPath === item.path ? 'var(--hover)' : 'transparent',
-                                    transition: '100ms'
+                                    transition: '100ms',
+                                    minHeight: isMobile ? '44px' : 'auto'
                                 }}
                                 onMouseEnter={(e) => {
                                     if (currentPath !== item.path) {
@@ -318,29 +385,34 @@ export default function FileExplorerApp() {
                 display: 'flex',
                 flexDirection: 'column',
                 background: 'var(--bg-secondary)',
-                overflow: 'hidden'
+                overflow: 'hidden',
+                marginTop: isMobile ? '50px' : '0',
+                marginLeft: isMobile && showSidebar ? '280px' : '0',
+                transition: isMobile ? 'margin-left 0.3s ease' : 'none'
             }}>
                 {/* Toolbar */}
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',
-                    padding: '8px 12px',
+                    padding: isMobile ? '6px 8px' : '8px 12px',
                     background: 'var(--bg-secondary)',
                     borderBottom: '1px solid var(--border)',
-                    gap: '8px'
+                    gap: isMobile ? '4px' : '8px',
+                    flexWrap: isMobile ? 'wrap' : 'nowrap'
                 }}>
                     <button
                         onClick={goBack}
                         disabled={historyIndex === 0}
                         style={{
-                            padding: '6px',
+                            padding: isMobile ? '8px' : '6px',
                             borderRadius: '4px',
                             border: 'none',
-                            background: 'var(--card)',
-                            color: 'var(--text)',
+                            background: historyIndex === 0 ? 'var(--bg)' : 'var(--card)',
+                            color: historyIndex === 0 ? 'var(--text-secondary)' : 'var(--text)',
                             cursor: historyIndex === 0 ? 'not-allowed' : 'pointer',
-                            opacity: historyIndex === 0 ? 0.5 : 1,
-                            transition: '100ms'
+                            transition: '100ms',
+                            minWidth: isMobile ? '40px' : 'auto',
+                            minHeight: isMobile ? '40px' : 'auto'
                         }}
                         onMouseEnter={(e) => {
                             if (historyIndex !== 0) {
@@ -353,20 +425,21 @@ export default function FileExplorerApp() {
                             }
                         }}
                     >
-                        <ArrowLeft className="w-4 h-4" />
+                        <ChevronLeft className={isMobile ? "w-5 h-5" : "w-4 h-4"} />
                     </button>
                     <button
                         onClick={goForward}
                         disabled={historyIndex === history.length - 1}
                         style={{
-                            padding: '6px',
+                            padding: isMobile ? '8px' : '6px',
                             borderRadius: '4px',
                             border: 'none',
-                            background: 'var(--card)',
-                            color: 'var(--text)',
+                            background: historyIndex === history.length - 1 ? 'var(--bg)' : 'var(--card)',
+                            color: historyIndex === history.length - 1 ? 'var(--text-secondary)' : 'var(--text)',
                             cursor: historyIndex === history.length - 1 ? 'not-allowed' : 'pointer',
-                            opacity: historyIndex === history.length - 1 ? 0.5 : 1,
-                            transition: '100ms'
+                            transition: '100ms',
+                            minWidth: isMobile ? '40px' : 'auto',
+                            minHeight: isMobile ? '40px' : 'auto'
                         }}
                         onMouseEnter={(e) => {
                             if (historyIndex !== history.length - 1) {
@@ -379,7 +452,7 @@ export default function FileExplorerApp() {
                             }
                         }}
                     >
-                        <ArrowRight className="w-4 h-4" />
+                        <ChevronRight className={isMobile ? "w-5 h-5" : "w-4 h-4"} />
                     </button>
                     <button
                         onClick={goUp}
@@ -414,16 +487,17 @@ export default function FileExplorerApp() {
                         alignItems: 'center',
                         background: 'var(--card)',
                         borderRadius: '7px',
-                        padding: '4px 8px',
-                        height: '32px',
-                        overflow: 'hidden'
+                        padding: isMobile ? '6px 10px' : '4px 8px',
+                        height: isMobile ? '36px' : '32px',
+                        overflow: 'hidden',
+                        minWidth: isMobile ? '120px' : 'auto'
                     }}>
-                        <HardDrive className="w-4 h-4 mr-2" style={{ color: 'var(--text-secondary)' }} />
+                        <HardDrive className={isMobile ? "w-5 h-5 mr-2" : "w-4 h-4 mr-2"} style={{ color: 'var(--text-secondary)' }} />
                         <div style={{
                             display: 'flex',
                             alignItems: 'center',
                             overflow: 'hidden',
-                            fontSize: '14px'
+                            fontSize: isMobile ? '15px' : '14px'
                         }}>
                             {pathSegments.map((segment, index) => (
                                 <React.Fragment key={index}>
@@ -463,33 +537,34 @@ export default function FileExplorerApp() {
 
                     <div style={{
                         position: 'relative',
-                        minWidth: '170px',
-                        width: '26%',
-                        maxWidth: '400px'
+                        minWidth: isMobile ? '100px' : '170px',
+                        width: isMobile ? '30%' : '26%',
+                        maxWidth: isMobile ? '200px' : '400px'
                     }}>
-                        <Search className="w-4 h-4" style={{
+                        <Search className={isMobile ? "w-5 h-5" : "w-4 h-4"} style={{
                             position: 'absolute',
-                            left: '8px',
+                            left: isMobile ? '10px' : '8px',
                             top: '50%',
                             transform: 'translateY(-50%)',
                             color: 'var(--text-secondary)'
                         }} />
                         <input
                             type="text"
-                            placeholder="Search"
+                            placeholder={isMobile ? "Search" : "Search"}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             style={{
                                 width: '100%',
-                                padding: '6px 8px 6px 30px',
+                                padding: isMobile ? '8px 10px 8px 35px' : '6px 8px 6px 30px',
                                 border: '1px solid var(--border)',
                                 borderRadius: '4px',
                                 background: 'var(--card)',
                                 color: 'var(--text)',
-                                fontSize: '14px',
+                                fontSize: isMobile ? '15px' : '14px',
                                 outline: 'none',
                                 whiteSpace: 'nowrap',
-                                textOverflow: 'ellipsis'
+                                textOverflow: 'ellipsis',
+                                height: isMobile ? '36px' : 'auto'
                             }}
                         />
                     </div>
@@ -504,13 +579,15 @@ export default function FileExplorerApp() {
                     <button
                         onClick={() => setViewMode('grid')}
                         style={{
-                            padding: '6px',
+                            padding: isMobile ? '8px' : '6px',
                             borderRadius: '4px',
                             border: 'none',
                             background: viewMode === 'grid' ? 'var(--hover)' : 'var(--card)',
                             color: 'var(--text)',
                             cursor: 'pointer',
-                            transition: '100ms'
+                            transition: '100ms',
+                            minWidth: isMobile ? '40px' : 'auto',
+                            minHeight: isMobile ? '40px' : 'auto'
                         }}
                         onMouseEnter={(e) => {
                             if (viewMode !== 'grid') {
@@ -523,18 +600,20 @@ export default function FileExplorerApp() {
                             }
                         }}
                     >
-                        <Grid className="w-4 h-4" />
+                        <Grid className={isMobile ? "w-5 h-5" : "w-4 h-4"} />
                     </button>
                     <button
                         onClick={() => setViewMode('list')}
                         style={{
-                            padding: '6px',
+                            padding: isMobile ? '8px' : '6px',
                             borderRadius: '4px',
                             border: 'none',
                             background: viewMode === 'list' ? 'var(--hover)' : 'var(--card)',
                             color: 'var(--text)',
                             cursor: 'pointer',
-                            transition: '100ms'
+                            transition: '100ms',
+                            minWidth: isMobile ? '40px' : 'auto',
+                            minHeight: isMobile ? '40px' : 'auto'
                         }}
                         onMouseEnter={(e) => {
                             if (viewMode !== 'list') {
@@ -547,17 +626,20 @@ export default function FileExplorerApp() {
                             }
                         }}
                     >
-                        <List className="w-4 h-4" />
+                        <List className={isMobile ? "w-5 h-5" : "w-4 h-4"} />
                     </button>
                     <button
+                        onClick={goUp}
                         style={{
-                            padding: '6px',
+                            padding: isMobile ? '8px' : '6px',
                             borderRadius: '4px',
                             border: 'none',
                             background: 'var(--card)',
                             color: 'var(--text)',
                             cursor: 'pointer',
-                            transition: '100ms'
+                            transition: '100ms',
+                            minWidth: isMobile ? '40px' : 'auto',
+                            minHeight: isMobile ? '40px' : 'auto'
                         }}
                         onMouseEnter={(e) => {
                             e.currentTarget.style.backgroundColor = 'var(--hover)';
@@ -566,7 +648,7 @@ export default function FileExplorerApp() {
                             e.currentTarget.style.backgroundColor = 'var(--card)';
                         }}
                     >
-                        <MoreHorizontal className="w-4 h-4" />
+                        <ChevronUp className={isMobile ? "w-5 h-5" : "w-4 h-4"} />
                     </button>
                 </div>
 
@@ -574,7 +656,7 @@ export default function FileExplorerApp() {
                 <div style={{
                     flex: 1,
                     overflow: 'auto',
-                    padding: '10px',
+                    padding: isMobile ? '8px' : '10px',
                     background: 'var(--bg)'
                 }}>
                     <div style={{
@@ -595,16 +677,21 @@ export default function FileExplorerApp() {
                             filteredItems.map((item) => (
                                 <div
                                     key={item.id}
-                                    onClick={(e) => handleItemClick(item, e)}
+                                    onClick={(e) => {
+                                        handleItemClick(item, e);
+                                        if (isMobile && showSidebar) {
+                                            setShowSidebar(false);
+                                        }
+                                    }}
                                     style={{
                                         width: '100%',
-                                        padding: '2px 5px',
+                                        padding: isMobile ? '8px 12px' : '2px 5px',
                                         borderRadius: '5px',
                                         display: 'flex',
                                         border: '1.5px solid transparent',
-                                        fontSize: '14px',
+                                        fontSize: isMobile ? '15px' : '14px',
                                         alignItems: 'center',
-                                        height: '30px',
+                                        height: isMobile ? '44px' : '30px',
                                         cursor: 'pointer',
                                         transition: '50ms',
                                         background: selectedItems.includes(item.id) ? 'var(--hover)' : 'transparent',
@@ -622,10 +709,10 @@ export default function FileExplorerApp() {
                                     }}
                                 >
                                     <div style={{
-                                        width: item.type === 'file' ? '22px' : '25px',
-                                        height: item.type === 'file' ? '22px' : '25px',
-                                        marginLeft: item.type === 'file' ? '2px' : '0',
-                                        marginRight: item.type === 'file' ? '7px' : '5px',
+                                        width: isMobile ? (item.type === 'file' ? '26px' : '28px') : (item.type === 'file' ? '22px' : '25px'),
+                                        height: isMobile ? (item.type === 'file' ? '26px' : '28px') : (item.type === 'file' ? '22px' : '25px'),
+                                        marginLeft: item.type === 'file' ? (isMobile ? '4px' : '2px') : '0',
+                                        marginRight: item.type === 'file' ? (isMobile ? '12px' : '7px') : (isMobile ? '10px' : '5px'),
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
@@ -641,7 +728,7 @@ export default function FileExplorerApp() {
                                     }}>
                                         {item.name}
                                     </span>
-                                    {item.size && (
+                                    {item.size && !isMobile && (
                                         <span style={{
                                             marginLeft: '10px',
                                             color: 'var(--text-secondary)',
@@ -652,15 +739,17 @@ export default function FileExplorerApp() {
                                             {item.size}
                                         </span>
                                     )}
-                                    <span style={{
-                                        marginLeft: '10px',
-                                        color: 'var(--text-secondary)',
-                                        fontSize: '12px',
-                                        minWidth: '80px',
-                                        textAlign: 'right'
-                                    }}>
-                                        {item.modified}
-                                    </span>
+                                    {!isMobile && (
+                                        <span style={{
+                                            marginLeft: '10px',
+                                            color: 'var(--text-secondary)',
+                                            fontSize: '12px',
+                                            minWidth: '80px',
+                                            textAlign: 'right'
+                                        }}>
+                                            {item.modified}
+                                        </span>
+                                    )}
                                 </div>
                             ))
                         )}
@@ -672,21 +761,34 @@ export default function FileExplorerApp() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    padding: '4px 12px',
+                    padding: isMobile ? '6px 12px' : '4px 12px',
                     background: 'var(--bg-secondary)',
                     borderTop: '1px solid var(--border)',
-                    fontSize: '12px',
-                    color: 'var(--text-secondary)'
+                    fontSize: isMobile ? '13px' : '12px',
+                    color: 'var(--text-secondary)',
+                    flexWrap: isMobile ? 'wrap' : 'nowrap',
+                    gap: isMobile ? '4px' : '0'
                 }}>
-                    <span>
+                    <span style={{
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap'
+                    }}>
                         {filteredItems.length} items
                         {selectedItems.length > 0 && ` (${selectedItems.length} selected)`}
                     </span>
-                    <span>
-                        {currentPath}
-                    </span>
+                    {!isMobile && (
+                        <span style={{
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            maxWidth: '50%'
+                        }}>
+                            {currentPath}
+                        </span>
+                    )}
                 </div>
             </div>
         </div>
     );
-} 
+}

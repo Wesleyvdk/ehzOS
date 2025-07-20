@@ -23,6 +23,20 @@ export default function Window({ window }: WindowProps) {
     const windowRef = useRef<HTMLDivElement>(null);
     const dragRef = useRef<HTMLDivElement>(null);
     const [isDragging, setIsDragging] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
+
+    // Mobile detection
+    useEffect(() => {
+        const checkMobile = () => {
+            const isMobileDevice = globalThis.innerWidth <= 768;
+            console.log('Mobile detection:', { width: globalThis.innerWidth, isMobile: isMobileDevice });
+            setIsMobile(isMobileDevice);
+        };
+        
+        checkMobile();
+        globalThis.addEventListener('resize', checkMobile);
+        return () => globalThis.removeEventListener('resize', checkMobile);
+    }, []);
 
     // Handle window focus when clicked
     const handleWindowClick = () => {
@@ -42,20 +56,63 @@ export default function Window({ window }: WindowProps) {
         updateWindowPosition(window.id, { x: data.x, y: data.y });
     };
 
-    // Prevent dragging when window is maximized
-    const isDraggable = !window.isMaximized;
+    // Prevent dragging when window is maximized or on mobile
+    const isDraggable = !window.isMaximized && !isMobile;
+
+    // Get mobile-friendly dimensions
+    const getMobileDimensions = () => {
+        if (!isMobile) {
+            return {
+                width: window.size.width,
+                height: window.size.height
+            };
+        }
+        
+        // Mobile-specific sizing
+        const viewportWidth = globalThis.innerWidth;
+        const viewportHeight = globalThis.innerHeight;
+        
+        return {
+            width: Math.min(viewportWidth - 40, 320), // Max 320px width with 20px margin on each side
+            height: Math.min(viewportHeight - 140, 500) // Max 500px height with space for taskbar
+        };
+    };
+
+    const mobileDimensions = getMobileDimensions();
+    
+    // Debug logging
+    console.log('Window render:', { 
+        windowId: window.id, 
+        isMobile, 
+        mobileDimensions, 
+        isMaximized: window.isMaximized,
+        originalSize: window.size 
+    });
 
     // Window style based on state
     const windowStyle = {
-        width: window.isMaximized ? '100vw' : window.size.width,
-        height: window.isMaximized ? 'calc(100vh - 64px)' : window.size.height,
-        transform: window.isMaximized ? 'translate(0, 0) !important' : undefined,
+        width: window.isMaximized ? '100vw' : (isMobile ? `${mobileDimensions.width}px` : window.size.width),
+        height: window.isMaximized ? 'calc(100vh - 64px)' : (isMobile ? `${mobileDimensions.height}px` : window.size.height),
         zIndex: window.zIndex,
+        ...(window.isMaximized ? {
+            transform: 'translate(0, 0) !important'
+        } : isMobile ? {
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)'
+        } : {})
     };
 
     // Get window CSS class based on state
     const getWindowClass = () => {
-        let classes = 'window absolute overflow-hidden ';
+        let classes = 'window overflow-hidden ';
+        
+        // Use fixed positioning for mobile, absolute for desktop
+        if (isMobile && !window.isMaximized) {
+            classes += 'fixed ';
+        } else {
+            classes += 'absolute ';
+        }
 
         if (window.isMaximized) {
             classes += 'rounded-none ';
@@ -101,14 +158,18 @@ export default function Window({ window }: WindowProps) {
             >
                 {/* Window Title Bar */}
                 <div className={`window-titlebar drag-handle flex items-center justify-between no-select ${window.isMaximized ? 'rounded-none' : 'rounded-t-2xl'
-                    }`}>
+                    }`}
+                    style={{
+                        padding: isMobile ? '8px 12px' : '12px 16px',
+                        minHeight: isMobile ? '40px' : '48px'
+                    }}>
                     <div className="flex items-center space-x-3">
-                        <div className="w-8 h-8 flex items-center justify-center rounded-lg bg-white bg-opacity-10 backdrop-blur-sm">
+                        <div className={`${isMobile ? 'w-6 h-6' : 'w-8 h-8'} flex items-center justify-center rounded-lg bg-white bg-opacity-10 backdrop-blur-sm`}>
                             {isIconPath(window.icon) ? (
                                 <img
                                     src={window.icon.startsWith('/') ? window.icon : `/${window.icon}`}
                                     alt={window.title}
-                                    className="w-5 h-5 object-contain"
+                                    className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'} object-contain`}
                                     style={{
                                         filter: window.icon.endsWith('.svg') ? 'brightness(0) invert(1)' : 'none',
                                         imageRendering: 'crisp-edges'
@@ -131,11 +192,11 @@ export default function Window({ window }: WindowProps) {
                                 <span className="text-xl"></span>
                             )}
                         </div>
-                        <span className="font-semibold text-white text-base tracking-wide">{window.title}</span>
+                        <span className={`font-semibold text-white tracking-wide ${isMobile ? 'text-sm' : 'text-base'}`}>{window.title}</span>
                     </div>
 
                     {/* Window Controls */}
-                    <div className="flex items-center space-x-1">
+                    <div className={`flex items-center ${isMobile ? 'space-x-0.5' : 'space-x-1'}`}>
                         <button
                             onClick={(e) => {
                                 e.stopPropagation();
@@ -143,8 +204,12 @@ export default function Window({ window }: WindowProps) {
                             }}
                             className="window-control minimize"
                             title="Minimize"
+                            style={{
+                                width: isMobile ? '28px' : '32px',
+                                height: isMobile ? '28px' : '32px'
+                            }}
                         >
-                            <Minus size={16} className="text-white" />
+                            <Minus size={isMobile ? 14 : 16} className="text-white" />
                         </button>
 
                         <button
@@ -154,11 +219,15 @@ export default function Window({ window }: WindowProps) {
                             }}
                             className="window-control maximize"
                             title={window.isMaximized ? "Restore Down" : "Maximize"}
+                            style={{
+                                width: isMobile ? '28px' : '32px',
+                                height: isMobile ? '28px' : '32px'
+                            }}
                         >
                             {window.isMaximized ? (
-                                <Square size={16} className="text-white" />
+                                <Square size={isMobile ? 14 : 16} className="text-white" />
                             ) : (
-                                <Maximize2 size={16} className="text-white" />
+                                <Maximize2 size={isMobile ? 14 : 16} className="text-white" />
                             )}
                         </button>
 
@@ -169,8 +238,12 @@ export default function Window({ window }: WindowProps) {
                             }}
                             className="window-control close"
                             title="Close"
+                            style={{
+                                width: isMobile ? '28px' : '32px',
+                                height: isMobile ? '28px' : '32px'
+                            }}
                         >
-                            <X size={16} className="text-white" />
+                            <X size={isMobile ? 14 : 16} className="text-white" />
                         </button>
                     </div>
                 </div>
@@ -182,11 +255,13 @@ export default function Window({ window }: WindowProps) {
                     style={{
                         height: window.isMaximized
                             ? 'calc(100vh - 128px)'
-                            : `${window.size.height - 64}px`
+                            : isMobile 
+                                ? `${mobileDimensions.height - (isMobile ? 40 : 64)}px`
+                                : `${window.size.height - 64}px`
                     }}
                 >
-                    <div className="h-full p-1">
-                        <div className={`h-full bg-black bg-opacity-10 backdrop-blur-sm ${window.isMaximized ? 'rounded-none' : 'rounded-xl'
+                    <div className={`h-full ${isMobile ? 'p-0.5' : 'p-1'}`}>
+                        <div className={`h-full bg-black bg-opacity-10 backdrop-blur-sm ${window.isMaximized ? 'rounded-none' : (isMobile ? 'rounded-lg' : 'rounded-xl')}
                             } overflow-hidden`}>
                             {window.id === 'edge' && state.edgeInitialUrl ? (
                                 <Component initialUrl={state.edgeInitialUrl} />
@@ -199,4 +274,4 @@ export default function Window({ window }: WindowProps) {
             </div>
         </Draggable>
     );
-} 
+}

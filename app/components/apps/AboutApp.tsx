@@ -1,9 +1,23 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Mail, MapPin, Github, Calendar, User, GraduationCap, Briefcase, Code, Target } from 'lucide-react';
 import { useOS } from '../../context/OSContext';
 
 export default function AboutApp() {
     const { openEdgeWithUrl } = useOS();
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth <= 768);
+        };
+        
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        
+        return () => {
+            window.removeEventListener('resize', checkMobile);
+        };
+    }, []);
 
     const handleLinkClick = (url: string, e: React.MouseEvent) => {
         e.preventDefault();
@@ -17,16 +31,16 @@ export default function AboutApp() {
             background: 'var(--bg)',
             color: 'var(--text)',
             fontFamily: 'system-ui, -apple-system, sans-serif',
-            padding: '20px',
+            padding: isMobile ? '10px' : '20px',
             overflow: 'auto'
         }}>
             <div style={{
-                maxWidth: '800px',
+                maxWidth: isMobile ? '100%' : '800px',
                 margin: '0 auto'
             }}>
                 <h1 style={{
-                    fontSize: '32px',
-                    marginBottom: '30px',
+                    fontSize: isMobile ? '24px' : '32px',
+                    marginBottom: isMobile ? '20px' : '30px',
                     color: 'var(--text)',
                     textAlign: 'center'
                 }}>
@@ -35,18 +49,18 @@ export default function AboutApp() {
 
                 <div style={{
                     display: 'grid',
-                    gap: '20px',
-                    marginBottom: '30px'
+                    gap: isMobile ? '15px' : '20px',
+                    marginBottom: isMobile ? '20px' : '30px'
                 }}>
                     <div style={{
                         background: 'var(--card)',
-                        padding: '20px',
-                        borderRadius: '12px',
+                        padding: isMobile ? '15px' : '20px',
+                        borderRadius: isMobile ? '8px' : '12px',
                         border: '1px solid var(--border)'
                     }}>
                         <h2 style={{
-                            fontSize: '24px',
-                            marginBottom: '15px',
+                            fontSize: isMobile ? '20px' : '24px',
+                            marginBottom: isMobile ? '10px' : '15px',
                             color: 'var(--text)'
                         }}>
                             Introduction
@@ -54,7 +68,8 @@ export default function AboutApp() {
                         <p style={{
                             lineHeight: '1.6',
                             color: 'var(--text-secondary)',
-                            marginBottom: '15px'
+                            marginBottom: isMobile ? '10px' : '15px',
+                            fontSize: isMobile ? '14px' : '16px'
                         }}>
                             Hello! I'm a motivated and eager-to-learn full-stack developer with experience in both frontend and backend web development.
                             I have completed an Associate Degree in Programming at AP University of Applied Arts and Sciences in Antwerp,
@@ -62,7 +77,8 @@ export default function AboutApp() {
                         </p>
                         <p style={{
                             lineHeight: '1.6',
-                            color: 'var(--text-secondary)'
+                            color: 'var(--text-secondary)',
+                            fontSize: isMobile ? '14px' : '16px'
                         }}>
                             I'm proficient in HTML, CSS, JavaScript and frameworks such as React and Vue 3, with knowledge of creating
                             user-friendly and scalable UIs. My backend experience includes working with Node.js, Express.js, C#, .NET,
@@ -72,13 +88,13 @@ export default function AboutApp() {
 
                     <div style={{
                         background: 'var(--card)',
-                        padding: '20px',
-                        borderRadius: '12px',
+                        padding: isMobile ? '15px' : '20px',
+                        borderRadius: isMobile ? '8px' : '12px',
                         border: '1px solid var(--border)'
                     }}>
                         <h2 style={{
-                            fontSize: '24px',
-                            marginBottom: '15px',
+                            fontSize: isMobile ? '20px' : '24px',
+                            marginBottom: isMobile ? '10px' : '15px',
                             color: 'var(--text)'
                         }}>
                             Current Focus
@@ -86,7 +102,7 @@ export default function AboutApp() {
                         <div style={{
                             display: 'flex',
                             flexDirection: 'column',
-                            gap: '15px'
+                            gap: isMobile ? '10px' : '15px'
                         }}>
                             <div style={{
                                 display: 'flex',
@@ -95,8 +111,8 @@ export default function AboutApp() {
                             }}>
                                 <span style={{ color: 'var(--accent)', fontSize: '18px' }}>🚀</span>
                                 <div>
-                                    <div style={{ color: 'var(--text)', fontWeight: '500' }}>Treffortly</div>
-                                    <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
+                                    <div style={{ color: 'var(--text)', fontWeight: '500', fontSize: isMobile ? '14px' : '16px' }}>Treffortly</div>
+                                    <div style={{ fontSize: isMobile ? '12px' : '14px', color: 'var(--text-secondary)' }}>
                                         Working on developing and expanding this web application with modern technologies
                                     </div>
                                 </div>
@@ -108,8 +124,8 @@ export default function AboutApp() {
                             }}>
                                 <span style={{ color: 'var(--accent)', fontSize: '18px' }}>☁️</span>
                                 <div>
-                                    <div style={{ color: 'var(--text)', fontWeight: '500' }}>AWS Certificates</div>
-                                    <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
+                                    <div style={{ color: 'var(--text)', fontWeight: '500', fontSize: isMobile ? '14px' : '16px' }}>AWS Certificates</div>
+                                    <div style={{ fontSize: isMobile ? '12px' : '14px', color: 'var(--text-secondary)' }}>
                                         Pursuing AWS certifications to enhance cloud computing expertise
                                     </div>
                                 </div>
@@ -121,8 +137,8 @@ export default function AboutApp() {
                             }}>
                                 <span style={{ color: 'var(--accent)', fontSize: '18px' }}>💼</span>
                                 <div>
-                                    <div style={{ color: 'var(--text)', fontWeight: '500' }}>Freelance Work</div>
-                                    <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
+                                    <div style={{ color: 'var(--text)', fontWeight: '500', fontSize: isMobile ? '14px' : '16px' }}>Freelance Work</div>
+                                    <div style={{ fontSize: isMobile ? '12px' : '14px', color: 'var(--text-secondary)' }}>
                                         Always open for new opportunities and projects. Contact me through email or contact form
                                     </div>
                                 </div>
@@ -132,27 +148,27 @@ export default function AboutApp() {
 
                     <div style={{
                         background: 'var(--card)',
-                        padding: '20px',
-                        borderRadius: '12px',
+                        padding: isMobile ? '15px' : '20px',
+                        borderRadius: isMobile ? '8px' : '12px',
                         border: '1px solid var(--border)'
                     }}>
                         <h2 style={{
-                            fontSize: '24px',
-                            marginBottom: '15px',
+                            fontSize: isMobile ? '20px' : '24px',
+                            marginBottom: isMobile ? '10px' : '15px',
                             color: 'var(--text)'
                         }}>
                             Skills & Technologies
                         </h2>
                         <div style={{
                             display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                            gap: '15px'
+                            gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(200px, 1fr))',
+                            gap: isMobile ? '10px' : '15px'
                         }}>
                             <div>
                                 <h3 style={{
                                     color: 'var(--accent)',
-                                    marginBottom: '10px',
-                                    fontSize: '16px'
+                                    marginBottom: isMobile ? '8px' : '10px',
+                                    fontSize: isMobile ? '14px' : '16px'
                                 }}>
                                     Frontend
                                 </h3>
@@ -161,12 +177,12 @@ export default function AboutApp() {
                                     padding: 0,
                                     margin: 0
                                 }}>
-                                    <li style={{ color: 'var(--text-secondary)', marginBottom: '5px' }}>React</li>
-                                    <li style={{ color: 'var(--text-secondary)', marginBottom: '5px' }}>Vue 3</li>
-                                    <li style={{ color: 'var(--text-secondary)', marginBottom: '5px' }}>TypeScript</li>
-                                    <li style={{ color: 'var(--text-secondary)', marginBottom: '5px' }}>JavaScript</li>
-                                    <li style={{ color: 'var(--text-secondary)', marginBottom: '5px' }}>HTML5 & CSS3</li>
-                                    <li style={{ color: 'var(--text-secondary)', marginBottom: '5px' }}>Tailwind CSS</li>
+                                    <li style={{ color: 'var(--text-secondary)', marginBottom: '5px', fontSize: isMobile ? '12px' : '14px' }}>React</li>
+                                    <li style={{ color: 'var(--text-secondary)', marginBottom: '5px', fontSize: isMobile ? '12px' : '14px' }}>Vue 3</li>
+                                    <li style={{ color: 'var(--text-secondary)', marginBottom: '5px', fontSize: isMobile ? '12px' : '14px' }}>TypeScript</li>
+                                    <li style={{ color: 'var(--text-secondary)', marginBottom: '5px', fontSize: isMobile ? '12px' : '14px' }}>JavaScript</li>
+                                    <li style={{ color: 'var(--text-secondary)', marginBottom: '5px', fontSize: isMobile ? '12px' : '14px' }}>HTML5 & CSS3</li>
+                                    <li style={{ color: 'var(--text-secondary)', marginBottom: '5px', fontSize: isMobile ? '12px' : '14px' }}>Tailwind CSS</li>
                                 </ul>
                             </div>
                             <div>
@@ -398,4 +414,4 @@ export default function AboutApp() {
             </div>
         </div>
     );
-} 
+}
